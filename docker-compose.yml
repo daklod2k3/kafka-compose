@@ -1,0 +1,30 @@
+
+services:
+  kafka:
+    image: apache/kafka:3.9.0
+    ports:
+      - "9092:9092"
+    environment:
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,DOCKER:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_ADVERTISED_LISTENERS=DOCKER://kafka:29092,CONTROLLER://localhost:29093,EXTERNAL://127.0.0.1:9092
+      - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_INTER_BROKER_LISTENER_NAME=DOCKER
+      - KAFKA_PROCESS_ROLES=broker,controller
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@localhost:29093
+      - KAFKA_NODE_ID=1
+      - KAFKA_LISTENERS=DOCKER://:29092,CONTROLLER://:29093,EXTERNAL://0.0.0.0:9092
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+    # volumes:
+    #   - /:/etc/cfg/
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui
+    ports:
+      - "8080:8080"
+    environment:
+      environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+      DYNAMIC_CONFIG_ENABLED: "true"
+    depends_on:
+      - kafka
